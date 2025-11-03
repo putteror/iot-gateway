@@ -6,8 +6,9 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/putteror/iot-gateway/http"
-	"github.com/putteror/iot-gateway/http/handler"
+	"github.com/putteror/iot-gateway/internal/app/service"
+	"github.com/putteror/iot-gateway/internal/interface/http"
+	"github.com/putteror/iot-gateway/internal/interface/http/handler"
 )
 
 func main() {
@@ -22,12 +23,18 @@ func main() {
 		apiServicePort = "8080"
 	}
 
+	dahuaNVRService := service.NewDahuaNVRService()
+	webhookService := service.NewWebhookService()
+
 	defaultHandler := handler.NewDefaultHandler()
 	inboundHandler := handler.NewInboundHandler()
-
+	dahuaNVRHandler := handler.NewDahuaNVRHandler(dahuaNVRService)
+	webhookHandler := handler.NewWebhookHandler(webhookService)
 	appRouter := http.NewRouter(
 		defaultHandler,
 		inboundHandler,
+		dahuaNVRHandler,
+		webhookHandler,
 	)
 
 	log.Printf("Server is starting on port %s", apiServicePort)
@@ -39,5 +46,8 @@ func main() {
 	if err := appRouter.Run(":" + apiServicePort); err != nil {
 		log.Fatalf("Could not listen on %s: %v\n", apiServicePort, err)
 	}
+
+	// For testing purpose
+	// integration.TestGetData()
 
 }

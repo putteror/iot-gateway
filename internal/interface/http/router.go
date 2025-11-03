@@ -5,12 +5,14 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/putteror/iot-gateway/http/handler"
+	"github.com/putteror/iot-gateway/internal/interface/http/handler"
 )
 
 func NewRouter(
 	defaultHandler *handler.DefaultHandler,
 	InboundHandler *handler.InboundHandler,
+	dahuaNVRHandler *handler.DahuaNVRHandler,
+	webhookHandler *handler.WebhookHandler,
 ) *gin.Engine {
 	router := gin.Default()
 
@@ -50,6 +52,18 @@ func NewRouter(
 			Inbound.PATCH("/:id", InboundHandler.Put)
 			Inbound.DELETE("/", InboundHandler.Delete)
 			Inbound.DELETE("/:id", InboundHandler.Delete)
+		}
+
+		dahuaNVR := api.Group("/dahua-nvr")
+		{
+			dahuaNVR.GET("/", dahuaNVRHandler.Get)
+			dahuaNVR.GET("/:id", dahuaNVRHandler.Get)
+			dahuaNVR.POST("/", dahuaNVRHandler.Post)
+		}
+
+		webhook := api.Group("/webhook")
+		{
+			webhook.POST("/by-pass", webhookHandler.ByPassPost)
 		}
 
 	}
