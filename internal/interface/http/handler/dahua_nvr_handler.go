@@ -26,7 +26,7 @@ func (h *DahuaNVRHandler) Get(c *gin.Context) {
 }
 
 // Create creates a new access control device.
-func (h *DahuaNVRHandler) Post(c *gin.Context) {
+func (h *DahuaNVRHandler) ReceiveFaceRecognitionEvent(c *gin.Context) {
 
 	// Get body data from json request
 	var bodyRequest *schema.DahuaNVRFaceRecognitionEvent
@@ -38,6 +38,23 @@ func (h *DahuaNVRHandler) Post(c *gin.Context) {
 	}
 
 	h.service.FaceRecognitionEvent(bodyRequest)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Successfully printed headers, parameters, and body to console",
+	})
+}
+
+func (h *DahuaNVRHandler) ReceiveLicensePlateRecognitionEvent(c *gin.Context) {
+	// Get body data from json request
+	var bodyRequest *schema.DahuaNVRLicensePlateRecognitionEvent
+	if err := c.ShouldBindJSON(&bodyRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Failed to read request body: " + err.Error(),
+		})
+		return
+	}
+
+	h.service.LicensePlateRecognitionEvent(bodyRequest)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Successfully printed headers, parameters, and body to console",

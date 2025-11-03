@@ -56,9 +56,8 @@ func NewRouter(
 
 		dahuaNVR := api.Group("/dahua-nvr")
 		{
-			dahuaNVR.GET("/", dahuaNVRHandler.Get)
-			dahuaNVR.GET("/:id", dahuaNVRHandler.Get)
-			dahuaNVR.POST("/", dahuaNVRHandler.Post)
+			dahuaNVR.POST("/face-recognition", dahuaNVRHandler.ReceiveFaceRecognitionEvent)
+			dahuaNVR.POST("/license-plate-recognition", dahuaNVRHandler.ReceiveLicensePlateRecognitionEvent)
 		}
 
 		webhook := api.Group("/webhook")
