@@ -9,3 +9,14 @@ type DahuaNVRFaceRecognitionEvent struct {
 	Province      string `json:"province"`
 	DateTimestamp string `json:"dateTimestamp"`
 }
+
+type DahuaNVRLicensePlateRecognitionEvent struct {
+	ID               string   `json:"id"`
+	Picture          string   `json:"picture"`
+	PlatePicture     string   `json:"platePicture"`
+	PlateText        string   `json:"plateText"`
+	Province         string   `json:"province"`
+	ConfidenceHeader []string `json:"confidenceHeader"`
+	CameraName       string   `json:"cameraName"`
+	DateTimestamp    string   `json:"dateTimestamp"`
+}

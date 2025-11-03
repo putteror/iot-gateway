@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/putteror/iot-gateway/internal/app/schema"
@@ -15,6 +16,7 @@ import (
 // Add service implementation here
 type DahuaNVRService interface {
 	FaceRecognitionEvent(paylaod *schema.DahuaNVRFaceRecognitionEvent) error
+	LicensePlateRecognitionEvent(paylaod *schema.DahuaNVRLicensePlateRecognitionEvent) error
 }
 
 type DahuaNVRServiceImpl struct {
@@ -26,7 +28,6 @@ func NewDahuaNVRService() DahuaNVRService {
 
 // Add service methods here
 func (s *DahuaNVRServiceImpl) FaceRecognitionEvent(paylaod *schema.DahuaNVRFaceRecognitionEvent) error {
-	fmt.Println(paylaod)
 
 	jsonPayload, err := json.Marshal(paylaod)
 	if err != nil {
@@ -35,8 +36,42 @@ func (s *DahuaNVRServiceImpl) FaceRecognitionEvent(paylaod *schema.DahuaNVRFaceR
 		return err
 	}
 
+	webhookUrl := config.WEBHOOK_HOST_ADDRESS + config.WEBHOOK_FACE_RECOGNITION_PATH
+	log.Println("Webhook URL:", webhookUrl)
+
 	// 2. ส่ง HTTP POST request
-	resp, err := http.Post(config.WEBHOOK_URL, "application/json", bytes.NewBuffer(jsonPayload))
+	resp, err := http.Post(webhookUrl, "application/json", bytes.NewBuffer(jsonPayload))
+	if err != nil {
+		fmt.Printf("Error sending webhook POST request: %v\n", err)
+		return err
+	}
+	// 3. ปิด body ของ response เพื่อไม่ให้เกิด resource leak
+	defer resp.Body.Close()
+
+	// 4. ตรวจสอบสถานะของ HTTP response (ไม่จำเป็นต้องอ่าน body ถ้าไม่ต้องการ)
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("Webhook responded with status code: %d\n", resp.StatusCode)
+	} else {
+		fmt.Println("Webhook sent successfully.")
+	}
+
+	return nil
+}
+
+func (s *DahuaNVRServiceImpl) LicensePlateRecognitionEvent(paylaod *schema.DahuaNVRLicensePlateRecognitionEvent) error {
+
+	jsonPayload, err := json.Marshal(paylaod)
+	if err != nil {
+		// จัดการกับข้อผิดพลาดในการแปลง JSON
+		fmt.Printf("Error marshalling JSON: %v\n", err)
+		return err
+	}
+
+	webhookUrl := config.WEBHOOK_HOST_ADDRESS + config.WEBHOOK_LICENSE_PLATE_RECOGNITION_PATH
+	log.Println("Webhook URL:", webhookUrl)
+
+	// 2. ส่ง HTTP POST request
+	resp, err := http.Post(webhookUrl, "application/json", bytes.NewBuffer(jsonPayload))
 	if err != nil {
 		fmt.Printf("Error sending webhook POST request: %v\n", err)
 		return err

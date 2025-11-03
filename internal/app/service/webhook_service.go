@@ -30,10 +30,11 @@ func (s *WebhookServiceImpl) WebhookByPassEvent(paylaod interface{}) string {
 		return "Error: Failed to marshal JSON"
 	}
 
-	println(config.WEBHOOK_URL)
+	webhookPath := "/api/inbound"
+	webhookUrl := config.WEBHOOK_HOST_ADDRESS + webhookPath
 
 	// 2. ส่ง HTTP POST request
-	resp, err := http.Post(config.WEBHOOK_URL, "application/json", bytes.NewBuffer(jsonPayload))
+	resp, err := http.Post(webhookUrl, "application/json", bytes.NewBuffer(jsonPayload))
 	if err != nil {
 		fmt.Printf("Error sending webhook POST request: %v\n", err)
 		return "Error: Failed to send webhook"
