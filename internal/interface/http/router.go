@@ -10,6 +10,7 @@ import (
 
 func NewRouter(
 	defaultHandler *handler.DefaultHandler,
+	hikvisionEmergencyHandler *handler.HikvisionEmergencyHandler,
 	InboundHandler *handler.InboundHandler,
 	dahuaNVRHandler *handler.DahuaNVRHandler,
 	webhookHandler *handler.WebhookHandler,
@@ -38,6 +39,14 @@ func NewRouter(
 			Default.PUT("/:id", defaultHandler.Update)
 			Default.PATCH("/", defaultHandler.Update)
 			Default.DELETE("/:id", defaultHandler.Delete)
+		}
+
+		hikvisionEmergency := api.Group("/hikvision-emergency")
+		{
+			hikvisionEmergency.GET("/", hikvisionEmergencyHandler.Get)
+			hikvisionEmergency.POST("/", hikvisionEmergencyHandler.Post)
+			hikvisionEmergency.PATCH("/", hikvisionEmergencyHandler.Put)
+			hikvisionEmergency.DELETE("/:id", hikvisionEmergencyHandler.Delete)
 		}
 
 		Inbound := api.Group("/inbound")
