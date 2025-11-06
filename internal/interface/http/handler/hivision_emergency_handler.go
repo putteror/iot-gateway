@@ -5,13 +5,34 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/putteror/iot-gateway/internal/app/schema"
+	"github.com/putteror/iot-gateway/internal/app/service"
 )
 
 type HikvisionEmergencyHandler struct {
+	service service.HikvisionEmergencyAlarmService
 }
 
-func NewHikvisionEmergencyHandler() *HikvisionEmergencyHandler {
-	return &HikvisionEmergencyHandler{}
+func NewHikvisionEmergencyHandler(service service.HikvisionEmergencyAlarmService) *HikvisionEmergencyHandler {
+	return &HikvisionEmergencyHandler{service: service}
+}
+
+func (h *HikvisionEmergencyHandler) ReceiveEmergencyAlarmEvent(c *gin.Context) {
+
+	// Get body data from json request
+	var bodyRequest *schema.HikvisionEmergencyAlarmEvent
+	if err := c.ShouldBindJSON(&bodyRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Failed to read request body: " + err.Error(),
+		})
+		return
+	}
+
+	h.service.EmergencyAlarmService(bodyRequest)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Successfully printed headers, parameters, and body to console",
+	})
 }
 
 func (h *HikvisionEmergencyHandler) Get(c *gin.Context) {

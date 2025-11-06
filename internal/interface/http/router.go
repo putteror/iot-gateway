@@ -41,8 +41,9 @@ func NewRouter(
 			Default.DELETE("/:id", defaultHandler.Delete)
 		}
 
-		hikvisionEmergency := api.Group("/hikvision-emergency")
+		hikvisionEmergency := api.Group("/hikvision")
 		{
+			hikvisionEmergency.POST("/emergency", hikvisionEmergencyHandler.ReceiveEmergencyAlarmEvent)
 			hikvisionEmergency.GET("/", hikvisionEmergencyHandler.Get)
 			hikvisionEmergency.POST("/", hikvisionEmergencyHandler.Post)
 			hikvisionEmergency.PATCH("/", hikvisionEmergencyHandler.Put)
