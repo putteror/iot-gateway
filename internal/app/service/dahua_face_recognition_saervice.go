@@ -38,22 +38,16 @@ func (s *DahuaCameraFaceRecognitionServiceImpl) FaceRecognitionEvent(paylaod *sc
 		return err
 	}
 	// แสดงผล JSON ที่ได้
-	fmt.Printf("Received Payload JSON: %s\n", string(returnJsonPayload))
+	// fmt.Printf("Received Payload JSON: %s\n", string(returnJsonPayload))
+
 	// convert image form /uploads/faceImage.jpg to base64 string
 	filePath := "./uploads/faceImage.jpg"
-	// 1. อ่านไฟล์เป็น []byte
 	fileData, err := os.ReadFile(filePath)
 	if err != nil {
-		// จัดการกับข้อผิดพลาดในการอ่านไฟล์
 		fmt.Printf("Error reading file %s: %v\n", filePath, err)
-		// คุณอาจเลือก return err หรือทำอย่างอื่น ขึ้นอยู่กับการจัดการข้อผิดพลาดที่คุณต้องการ
 		return err
 	}
-	// 2. แปลง []byte ที่อ่านได้ให้เป็น Base64 string
 	base64String := base64.StdEncoding.EncodeToString(fileData)
-
-	// 3. แสดงผล Base64 string (หรือนำไปใช้ตามความต้องการ)
-	fmt.Printf("Base64 String: %s\n", base64String)
 
 	// Prepare the webhook URL
 	now := time.Now()
@@ -77,7 +71,7 @@ func (s *DahuaCameraFaceRecognitionServiceImpl) FaceRecognitionEvent(paylaod *sc
 		return err
 	}
 	// แสดงผล JSON ที่ได้
-	fmt.Printf("Converted Payload JSON: %s\n", string(convertedJsonPayload))
+	// fmt.Printf("Converted Payload JSON: %s\n", string(convertedJsonPayload))
 
 	webhookUrl := config.WEBHOOK_HOST_ADDRESS + config.WEBHOOK_PATH
 	log.Println("Webhook URL:", webhookUrl)
