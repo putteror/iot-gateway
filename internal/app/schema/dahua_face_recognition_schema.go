@@ -16,6 +16,34 @@ type SendDahuaCameraFaceRecognitionPayload struct {
 	} `json:"meta"`
 }
 
+/*
+{
+    "type": "warning",
+    "severity": "medium",
+    "titleKey": "notis.motionDetected",
+     "img": "",
+    "occurredAt": "2025-11-07T03:15:00Z",
+    "meta": {
+      "category": "fall",
+      "trackedBy": "Lobby Camera",
+      "confidence": 0.94
+    }
+    }
+*/
+
+type SendDuhaCameraMotionDetectPayload struct {
+	Type        string `json:"type"`
+	Severity    string `json:"severity"`
+	TitleKey    string `json:"titleKey"`
+	ImageBase64 string `json:"img"`
+	OccurredAt  string `json:"occurredAt"`
+	Meta        struct {
+		Category   string  `json:"category"`
+		TrackedBy  string  `json:"trackedBy"`
+		Confidence float32 `json:"confidence"`
+	} `json:"meta"`
+}
+
 // Demo receive paramer
 // {"Action":"Stop","Code":"FaceRecognition","Data":{"Address":"","Class":"FaceRecognition","Face":{"Age":25,"Beard":1,"BoundingBox":[4416,5784,4896,6840],"Center":[4656,6312],"Feature":["Neutral","NoGlasses"],"Frequency":null,"Glass":1,"Mask":1,"ObjectID":294,"ObjectType":"HumanFace","RelativeID":0,"Sex":"Man"},"IsGlobalScene":false,"Name":"FaceAnalysis","Object":{"Action":"Appear","Age":25,"Angle":[20,0,20],"ArgFS":1,"ArgResv2":2,"Attractive":48,"Beard":1,"BelongID":0,"BoundingBox":[4416,5784,4896,6840],"Center":[4656,6312],"Complexion":1,"Confidence":255,"Emotion":"Neutral","Express":6,"Eye":2,"FaceAlignScore":0,"FaceQuality":76,"Feature":["Neutral","NoGlasses"],"FeatureVersion":"1003002001002","FrameSequence":50457,"Gender":2,"Glass":1,"IsNewPassby":0,"Mask":1,"Mouth":1,"ObjectID":294,"ObjectType":"HumanFace","RelativeID":0,"SerialUUID":"","Sex":"Man","Source":0,"Speed":0,"SpeedTypeInternal":0,"Strabismus":0,"faceTripLineDirection":0,"installDiagnosticStat":{"Hight":1056,"PitchAngle":20,"Quality":76,"RollAngle":20,"Width":480,"YawAngle":0}},"RealUTC":1762497130,"RuleID":2},"Index":0}
 
