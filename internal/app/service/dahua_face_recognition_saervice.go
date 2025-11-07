@@ -3,15 +3,13 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-
-	"github.com/putteror/iot-gateway/internal/app/schema"
 )
 
 // Add necessary imports here
 
 // Add service implementation here
 type DahuaCameraFaceRecognitionService interface {
-	FaceRecognitionEvent(paylaod *schema.DahuaNVRFaceRecognitionEvent) error
+	FaceRecognitionEvent(paylaod interface{}) error
 }
 
 type DahuaCameraFaceRecognitionServiceImpl struct {
@@ -22,7 +20,7 @@ func NewDahuaCameraFaceRecognitionService() DahuaCameraFaceRecognitionService {
 }
 
 // Add service methods here
-func (s *DahuaCameraFaceRecognitionServiceImpl) FaceRecognitionEvent(paylaod *schema.DahuaNVRFaceRecognitionEvent) error {
+func (s *DahuaCameraFaceRecognitionServiceImpl) FaceRecognitionEvent(paylaod interface{}) error {
 
 	jsonPayload, err := json.Marshal(paylaod)
 	if err != nil {
