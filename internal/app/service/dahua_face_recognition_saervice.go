@@ -65,8 +65,8 @@ func (s *DahuaCameraFaceRecognitionServiceImpl) FaceRecognitionEvent(paylaod *sc
 	sendFaceRecPayload.Meta.RawID = "face-001"
 
 	var sendMotionPayload schema.SendDuhaCameraMotionDetectPayload
-	sendMotionPayload.Type = "info"
-	sendMotionPayload.Severity = "low"
+	sendMotionPayload.Type = "warning"
+	sendMotionPayload.Severity = "medium"
 	sendMotionPayload.TitleKey = "notis.motionDetected"
 	sendMotionPayload.ImageBase64 = base64String
 	sendMotionPayload.OccurredAt = iso8601String
