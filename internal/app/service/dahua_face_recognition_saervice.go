@@ -51,8 +51,14 @@ func (s *DahuaCameraFaceRecognitionServiceImpl) FaceRecognitionEvent(paylaod *sc
 		fmt.Printf("Error unmarshalling JSON: %v\n", err)
 		return err
 	}
-
-	fmt.Printf("Send Payload: %+v\n", sendPayload)
+	convertedJsonPayload, err := json.Marshal(sendPayload)
+	if err != nil {
+		// จัดการกับข้อผิดพลาดในการแปลง JSON
+		fmt.Printf("Error marshalling JSON: %v\n", err)
+		return err
+	}
+	// แสดงผล JSON ที่ได้
+	fmt.Printf("Converted Payload JSON: %s\n", string(convertedJsonPayload))
 
 	/*
 
