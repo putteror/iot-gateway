@@ -75,7 +75,7 @@ func NewRouter(
 		{
 
 			dahuaCameraFaceRecognition.POST("/data/", dahuaCameraFaceRecognitionHandler.ReceiveFaceRecognitionEvent)
-			dahuaCameraFaceRecognition.POST("/image/", dahuaCameraFaceRecognitionHandler.ReceiveFaceRecognitionImage)
+			dahuaCameraFaceRecognition.POST("/picture/", dahuaCameraFaceRecognitionHandler.ReceiveFaceRecognitionImage)
 		}
 
 		webhook := api.Group("/webhook")
