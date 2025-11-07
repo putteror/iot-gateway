@@ -1,11 +1,15 @@
 package handler
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"log"
+	"mime"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/putteror/iot-gateway/internal/app/schema"
@@ -49,43 +53,102 @@ func (h *DahuaCameraFaceRecognitionHandler) ReceiveFaceRecognitionEvent(c *gin.C
 }
 
 func (h *DahuaCameraFaceRecognitionHandler) ReceiveFaceRecognitionImage(c *gin.Context) {
-	file, err := c.FormFile("image") // 'image' คือชื่อ field name ของไฟล์ใน form-data
+	contentType := c.Request.Header.Get("Content-Type")
+	_, params, err := mime.ParseMediaType(contentType)
+	if err != nil || params["boundary"] == "" || !strings.Contains(contentType, "multipart/x-mixed-replace") {
+		log.Printf("Invalid Content-Type or missing boundary: %s", contentType)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Content-Type. Expected multipart/x-mixed-replace with boundary."})
+		return
+	}
+
+	// สร้างสตริง Boundary ที่ใช้จริง (เช่น --myboundary)
+	boundary := "--" + params["boundary"]
+
+	// 2. อ่าน Request Body ทั้งหมด
+	bodyBytes, err := io.ReadAll(c.Request.Body)
 	if err != nil {
-		log.Println("Failed to get file 'image' . Ensure the file field name is correct.")
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Failed to get file 'image' from form: %v. Ensure the file field name is correct.", err)})
+		log.Printf("Error reading request body: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error reading request body: %v", err)})
 		return
 	}
 
-	// 2. รับข้อมูล Metadata (ถ้ามี)
-	// ถ้ามีการส่งข้อมูล JSON/Text อื่นๆ มาใน Multipart form field อื่นๆ
-	// ตัวอย่าง: ดึงค่าจาก form field ชื่อ "metadata"
-	// metadata := c.PostForm("metadata")
-	// fmt.Printf("Received Metadata (if any): %s\n", metadata)
+	// เนื่องจากข้อมูลไบนารีอาจเสียหายหากแปลงเป็น string เราจึงทำงานบน []byte โดยตรง
+	// เราจะใช้ bytes.Split เพื่อแบ่งข้อมูลตาม Boundary
 
-	// 3. ประมวลผลไฟล์ที่ได้รับ
+	// 3. แบ่ง Body ออกเป็นส่วนๆ ตาม Boundary
+	// Parts[0] จะเป็น preamble ก่อน Boundary แรก
+	// Parts[1] จะเป็น JSON Payload
+	// Parts[2] จะเป็น Image Payload
+	parts := bytes.Split(bodyBytes, []byte(boundary))
 
-	// สร้างชื่อไฟล์ที่ไม่ซ้ำกันเพื่อบันทึก (ตัวอย่าง)
-	fileName := "faceImage" + file.Filename
-	savePath := filepath.Join("./uploads", fileName) // กำหนด path ที่จะบันทึก
+	// 4. วนหาและประมวลผลส่วนที่เป็น Image/JPEG
+	for _, part := range parts {
+		// Trim carriage returns/newlines ที่อาจมี
+		part = bytes.TrimSpace(part)
+		if len(part) == 0 || bytes.HasSuffix(part, []byte("--")) {
+			continue // ข้ามส่วนว่างเปล่าหรือส่วนท้าย (EOF)
+		}
 
-	// ตรวจสอบหรือสร้าง directory
-	if _, err := os.Stat("./uploads"); os.IsNotExist(err) {
-		os.Mkdir("./uploads", os.ModePerm)
+		// ตรวจสอบว่าเป็น Image/JPEG หรือไม่
+		if bytes.Contains(part, []byte("Content-Type: image/jpeg")) {
+			// 4.1 แยก Header และ Body
+			// หาจุดสิ้นสุดของ Header (ดับเบิ้ล Newline/Carriage Return: \r\n\r\n)
+			// ใช้ \n\n หรือ \r\n\r\n ในการหา ขึ้นอยู่กับ client
+			headerEndIndex := bytes.Index(part, []byte("\r\n\r\n"))
+			if headerEndIndex == -1 {
+				// ลองใช้ \n\n (อาจจะเกิดจากระบบปฏิบัติการที่ใช้)
+				headerEndIndex = bytes.Index(part, []byte("\n\n"))
+				if headerEndIndex == -1 {
+					log.Println("Could not find end of header in image part.")
+					continue
+				}
+			}
+
+			// 4.2 ดึง Binary Data ของรูปภาพ
+			// ข้อมูลรูปภาพจะอยู่หลัง \r\n\r\n (ยาว 4 ไบต์) หรือ \n\n (ยาว 2 ไบต์)
+			var imageBody []byte
+			if bytes.HasPrefix(part[headerEndIndex:], []byte("\r\n\r\n")) {
+				imageBody = part[headerEndIndex+4:]
+			} else if bytes.HasPrefix(part[headerEndIndex:], []byte("\n\n")) {
+				imageBody = part[headerEndIndex+2:]
+			} else {
+				imageBody = part[headerEndIndex:] // กรณีที่ body ต่อทันที
+			}
+
+			// 5. บันทึกไฟล์
+			// ตรวจสอบหรือสร้าง directory
+			uploadDir := "./uploads"
+			if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
+				if err := os.Mkdir(uploadDir, os.ModePerm); err != nil {
+					log.Printf("Failed to create directory %s: %v", uploadDir, err)
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create upload directory"})
+					return
+				}
+			}
+
+			// สร้างชื่อไฟล์ที่ไม่ซ้ำกัน (ใช้ RealUTC หรือ EventID จาก JSON มาช่วยได้)
+			fileName := fmt.Sprintf("faceImage_%d.jpeg", c.MustGet("EventSeq").(int)) // สมมติว่าดึง EventSeq จาก JSON มาเก็บใน Context แล้ว
+			savePath := filepath.Join(uploadDir, fileName)
+
+			if err := os.WriteFile(savePath, imageBody, 0644); err != nil {
+				log.Printf("Failed to save image file: %v", err)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to save file: %v", err)})
+				return
+			}
+
+			fmt.Printf("✅ File saved successfully to %s (Size: %d bytes)\n", savePath, len(imageBody))
+
+			// 6. ส่ง response กลับและหยุดการทำงาน (สมมติว่าต้องการแค่รูปเดียว)
+			c.JSON(http.StatusOK, gin.H{
+				"message":  "Image received and saved successfully from multipart/x-mixed-replace",
+				"saved_to": savePath,
+				"size":     len(imageBody),
+			})
+			return
+		}
 	}
 
-	// บันทึกไฟล์ที่อัปโหลด
-	if err := c.SaveUploadedFile(file, savePath); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to save file: %v", err)})
-		return
-	}
-
-	fmt.Printf("File %s uploaded successfully to %s\n", file.Filename, savePath)
-
-	// 4. ส่ง response กลับ
-	c.JSON(http.StatusOK, gin.H{
-		"message":  "Image received and saved successfully",
-		"filename": file.Filename,
-		"size":     file.Size,
-		"saved_to": savePath,
-	})
+	// ถ้าไม่พบรูปภาพ JPEG เลย
+	log.Println("No JPEG image part found in the request body.")
+	c.JSON(http.StatusBadRequest, gin.H{"error": "No JPEG image part found in the request body."})
 }
