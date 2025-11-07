@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -50,6 +51,7 @@ func (h *DahuaCameraFaceRecognitionHandler) ReceiveFaceRecognitionEvent(c *gin.C
 func (h *DahuaCameraFaceRecognitionHandler) ReceiveFaceRecognitionImage(c *gin.Context) {
 	file, err := c.FormFile("image") // 'image' คือชื่อ field name ของไฟล์ใน form-data
 	if err != nil {
+		log.Println("Failed to get file 'image' . Ensure the file field name is correct.")
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Failed to get file 'image' from form: %v. Ensure the file field name is correct.", err)})
 		return
 	}

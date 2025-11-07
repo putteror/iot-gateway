@@ -73,7 +73,6 @@ func NewRouter(
 
 		dahuaCameraFaceRecognition := api.Group("/dahua/camera/face-recognition")
 		{
-
 			dahuaCameraFaceRecognition.POST("/data/", dahuaCameraFaceRecognitionHandler.ReceiveFaceRecognitionEvent)
 			dahuaCameraFaceRecognition.POST("/picture/", dahuaCameraFaceRecognitionHandler.ReceiveFaceRecognitionImage)
 		}
