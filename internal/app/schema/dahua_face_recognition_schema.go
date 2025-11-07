@@ -1,11 +1,12 @@
 package schema
 
 type SendDahuaCameraFaceRecognitionPayload struct {
-	Type       string `json:"type"`
-	Severity   string `json:"severity"`
-	TitleKey   string `json:"titleKey"`
-	OccurredAt string `json:"occurredAt"`
-	Meta       struct {
+	Type        string `json:"type"`
+	Severity    string `json:"severity"`
+	TitleKey    string `json:"titleKey"`
+	ImageBase64 string `json:"img"`
+	OccurredAt  string `json:"occurredAt"`
+	Meta        struct {
 		Kind   string `json:"kind"`
 		Person struct {
 			FullName string `json:"fullName"`
