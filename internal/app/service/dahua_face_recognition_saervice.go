@@ -3,13 +3,16 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
+	"github.com/putteror/iot-gateway/internal/app/schema"
 )
 
 // Add necessary imports here
 
 // Add service implementation here
 type DahuaCameraFaceRecognitionService interface {
-	FaceRecognitionEvent(paylaod interface{}) error
+	FaceRecognitionEvent(paylaod *schema.ReceiveDahuaCameraFaceRecognitionPayload) error
 }
 
 type DahuaCameraFaceRecognitionServiceImpl struct {
@@ -20,17 +23,36 @@ func NewDahuaCameraFaceRecognitionService() DahuaCameraFaceRecognitionService {
 }
 
 // Add service methods here
-func (s *DahuaCameraFaceRecognitionServiceImpl) FaceRecognitionEvent(paylaod interface{}) error {
+func (s *DahuaCameraFaceRecognitionServiceImpl) FaceRecognitionEvent(paylaod *schema.ReceiveDahuaCameraFaceRecognitionPayload) error {
 
-	jsonPayload, err := json.Marshal(paylaod)
+	returnJsonPayload, err := json.Marshal(paylaod)
 	if err != nil {
 		// จัดการกับข้อผิดพลาดในการแปลง JSON
 		fmt.Printf("Error marshalling JSON: %v\n", err)
 		return err
 	}
+	// แสดงผล JSON ที่ได้
+	fmt.Printf("Received Payload JSON: %s\n", string(returnJsonPayload))
 
-	//print jsonPayload to console
-	fmt.Println("JSON Payload:", string(jsonPayload))
+	now := time.Now()
+	iso8601String := now.Format(time.RFC3339)
+
+	var sendPayload schema.SendDahuaCameraFaceRecognitionPayload
+	sendPayload.Type = "info"
+	sendPayload.Severity = "low"
+	sendPayload.TitleKey = "notis.faceDetected"
+	sendPayload.OccurredAt = iso8601String
+	sendPayload.Meta.Kind = "face"
+	sendPayload.Meta.Person.FullName = paylaod.Data.Name
+	sendPayload.Meta.Person.Gender = "MALE"
+	sendPayload.Meta.RawID = "face-001"
+	err = json.Unmarshal(returnJsonPayload, &sendPayload)
+	if err != nil {
+		fmt.Printf("Error unmarshalling JSON: %v\n", err)
+		return err
+	}
+
+	fmt.Printf("Send Payload: %+v\n", sendPayload)
 
 	/*
 
