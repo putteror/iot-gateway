@@ -67,19 +67,13 @@ func (s *DahuaCameraFaceRecognitionServiceImpl) FaceRecognitionEvent(paylaod *sc
 	var sendMotionPayload schema.SendDuhaCameraMotionDetectPayload
 	sendMotionPayload.Type = "info"
 	sendMotionPayload.Severity = "low"
-	sendMotionPayload.TitleKey = "notis.faceDetected"
+	sendMotionPayload.TitleKey = "notis.motionDetected"
 	sendMotionPayload.ImageBase64 = base64String
 	sendMotionPayload.OccurredAt = iso8601String
 	sendMotionPayload.Meta.Category = "fall"
 	sendMotionPayload.Meta.TrackedBy = "smartpole"
 	sendMotionPayload.Meta.Confidence = 0.94
 
-	convertedJsonPayload, err := json.Marshal(sendFaceRecPayload)
-	if err != nil {
-		// จัดการกับข้อผิดพลาดในการแปลง JSON
-		fmt.Printf("Error marshalling JSON: %v\n", err)
-		return err
-	}
 	// แสดงผล JSON ที่ได้
 	// fmt.Printf("Converted Payload JSON: %s\n", string(convertedJsonPayload))
 
@@ -89,6 +83,13 @@ func (s *DahuaCameraFaceRecognitionServiceImpl) FaceRecognitionEvent(paylaod *sc
 
 	webhookUrl := config.WEBHOOK_HOST_ADDRESS + config.WEBHOOK_PATH
 	log.Println("Webhook URL:", webhookUrl)
+
+	convertedJsonPayload, err := json.Marshal(sendFaceRecPayload)
+	if err != nil {
+		// จัดการกับข้อผิดพลาดในการแปลง JSON
+		fmt.Printf("Error marshalling JSON: %v\n", err)
+		return err
+	}
 
 	client := &http.Client{}
 
