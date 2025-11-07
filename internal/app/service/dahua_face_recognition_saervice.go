@@ -66,7 +66,7 @@ func (s *DahuaCameraFaceRecognitionServiceImpl) FaceRecognitionEvent(paylaod *sc
 	// แสดงผล JSON ที่ได้
 	fmt.Printf("Converted Payload JSON: %s\n", string(convertedJsonPayload))
 
-	webhookUrl := config.WEBHOOK_HOST_ADDRESS
+	webhookUrl := config.WEBHOOK_HOST_ADDRESS + config.WEBHOOK_PATH
 	log.Println("Webhook URL:", webhookUrl)
 
 	// 2. ส่ง HTTP POST request
