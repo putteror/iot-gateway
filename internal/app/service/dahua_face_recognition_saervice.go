@@ -31,12 +31,12 @@ func NewDahuaCameraFaceRecognitionService() DahuaCameraFaceRecognitionService {
 // Add service methods here
 func (s *DahuaCameraFaceRecognitionServiceImpl) FaceRecognitionEvent(paylaod *schema.ReceiveDahuaCameraFaceRecognitionPayload) error {
 
-	returnJsonPayload, err := json.Marshal(paylaod)
-	if err != nil {
-		// จัดการกับข้อผิดพลาดในการแปลง JSON
-		fmt.Printf("Error marshalling JSON: %v\n", err)
-		return err
-	}
+	// returnJsonPayload, err := json.Marshal(paylaod)
+	// if err != nil {
+	// 	// จัดการกับข้อผิดพลาดในการแปลง JSON
+	// 	fmt.Printf("Error marshalling JSON: %v\n", err)
+	// 	return err
+	// }
 	// แสดงผล JSON ที่ได้
 	// fmt.Printf("Received Payload JSON: %s\n", string(returnJsonPayload))
 
