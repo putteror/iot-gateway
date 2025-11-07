@@ -41,7 +41,7 @@ func (s *DahuaCameraFaceRecognitionServiceImpl) FaceRecognitionEvent(paylaod *sc
 	// fmt.Printf("Received Payload JSON: %s\n", string(returnJsonPayload))
 
 	// convert image form /uploads/faceImage.jpg to base64 string
-	filePath := "./uploads/faceImage.jpg"
+	filePath := "./uploads/faceImage_%!d(string=).jpeg"
 	fileData, err := os.ReadFile(filePath)
 	if err != nil {
 		fmt.Printf("Error reading file %s: %v\n", filePath, err)
