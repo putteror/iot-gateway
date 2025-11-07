@@ -23,6 +23,16 @@ func main() {
 		apiServicePort = "8080"
 	}
 
+	uploadsDirPath := "./uploads"
+
+	// Ensure the uploads directory exists
+	if _, err := os.Stat(uploadsDirPath); os.IsNotExist(err) {
+		if err := os.MkdirAll(uploadsDirPath, os.ModePerm); err != nil {
+			log.Fatalf("Failed to create uploads directory: %v", err)
+		}
+		log.Printf("Created uploads directory: %s", uploadsDirPath)
+	}
+
 	dahuaNVRService := service.NewDahuaNVRService()
 	dahuaCameraFaceRecognitionService := service.NewDahuaCameraFaceRecognitionService()
 	webhookService := service.NewWebhookService()
