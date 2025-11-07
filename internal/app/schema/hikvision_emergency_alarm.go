@@ -1,19 +1,32 @@
 package schema
 
-// {
-//     "siteId" : "7e56ca2b-b741-4eba-9fe7-3b30222ecc28",
-//     "type" : "emergency",
-//     "description" : "alarm trigger",
-//     "status" : "active",
-//     "img" : null,
-//     "alarmDateTime" : "2025-11-05T02:20:02Z"
+//   "type": "alert",
+//   "severity": "critical",
+//   "titleKey": "notis.fallDetected",
+//   "title": "ตรวจพบคนล้มบริเวณ Lobby",
+//   "img": "https://example.com/lobby/fall-frame.jpg",
+//   "occurredAt": "2025-02-11T14:32:10+07:00",
+//   "meta": {
+//     "cameraName": "Lobby Camera",
+//     "zone": "Lobby North",
+//     "confidence": 0.91,
+//     "clip": "https://example.com/lobby/fall-highlight.mp4"
+//   }
 // }
 
+type HikvisionEmergencyAlarmEventMeta struct {
+	CameraName string  `json:"cameraName"`
+	Zone       string  `json:"zone"`
+	Confidence float64 `json:"confidence"`
+	Clip       string  `json:"clip"`
+}
+
 type HikvisionEmergencyAlarmEvent struct {
-	SiteID        string `json:"siteId"`
-	Type          string `json:"type"`
-	Description   string `json:"description"`
-	Status        string `json:"status"`
-	Img           string `json:"img"`
-	AlarmDateTime string `json:"alarmDateTime"`
+	Type       string                 `json:"type"`
+	Severity   string                 `json:"severity"`
+	TitleKey   string                 `json:"titleKey"`
+	Title      string                 `json:"title"`
+	Img        string                 `json:"img"`
+	OccurredAt string                 `json:"occurredAt"`
+	Meta       map[string]interface{} `json:"meta"`
 }

@@ -24,6 +24,7 @@ func main() {
 	}
 
 	dahuaNVRService := service.NewDahuaNVRService()
+	dahuaCameraFaceRecognitionService := service.NewDahuaCameraFaceRecognitionService()
 	webhookService := service.NewWebhookService()
 	hikvisionEmergencyAlarmService := service.NewHikvisionEmergencyAlarmService()
 
@@ -31,12 +32,14 @@ func main() {
 	hikvisionEmergencyHandler := handler.NewHikvisionEmergencyHandler(hikvisionEmergencyAlarmService)
 	inboundHandler := handler.NewInboundHandler()
 	dahuaNVRHandler := handler.NewDahuaNVRHandler(dahuaNVRService)
+	dahuaCameraFaceRecognitionHandler := handler.NewDahuaCameraFaceRecognitionHandler(dahuaCameraFaceRecognitionService)
 	webhookHandler := handler.NewWebhookHandler(webhookService)
 	appRouter := http.NewRouter(
 		defaultHandler,
 		hikvisionEmergencyHandler,
 		inboundHandler,
 		dahuaNVRHandler,
+		dahuaCameraFaceRecognitionHandler,
 		webhookHandler,
 	)
 

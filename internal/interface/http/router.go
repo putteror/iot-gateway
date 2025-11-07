@@ -13,6 +13,7 @@ func NewRouter(
 	hikvisionEmergencyHandler *handler.HikvisionEmergencyHandler,
 	InboundHandler *handler.InboundHandler,
 	dahuaNVRHandler *handler.DahuaNVRHandler,
+	dahuaCameraFaceRecognitionHandler *handler.DahuaCameraFaceRecognitionHandler,
 	webhookHandler *handler.WebhookHandler,
 ) *gin.Engine {
 	router := gin.Default()
@@ -68,6 +69,11 @@ func NewRouter(
 		{
 			dahuaNVR.POST("/face-recognition", dahuaNVRHandler.ReceiveFaceRecognitionEvent)
 			dahuaNVR.POST("/license-plate-recognition", dahuaNVRHandler.ReceiveLicensePlateRecognitionEvent)
+		}
+
+		dahuaCameraFaceRecognition := api.Group("/dahua/camera/face-recognition")
+		{
+			dahuaCameraFaceRecognition.POST("/data", dahuaCameraFaceRecognitionHandler.ReceiveFaceRecognitionEvent)
 		}
 
 		webhook := api.Group("/webhook")
