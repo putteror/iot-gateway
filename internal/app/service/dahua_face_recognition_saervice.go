@@ -65,8 +65,21 @@ func (s *DahuaCameraFaceRecognitionServiceImpl) FaceRecognitionEvent(paylaod *sc
 	webhookUrl := config.WEBHOOK_HOST_ADDRESS + config.WEBHOOK_PATH
 	log.Println("Webhook URL:", webhookUrl)
 
-	// 2. ส่ง HTTP POST request
-	resp, err := http.Post(webhookUrl, "application/json", bytes.NewBuffer(convertedJsonPayload))
+	// add X-Device-Key to header
+	// สร้าง HTTP client
+	client := &http.Client{}
+
+	// 1. สร้าง HTTP request
+	req, err := http.NewRequest("POST", webhookUrl, bytes.NewBuffer(convertedJsonPayload))
+	if err != nil {
+		fmt.Printf("Error creating HTTP request: %v\n", err)
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Device-Key", "FACE-REC-F01")
+
+	// 2. ส่ง HTTP request
+	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Printf("Error sending webhook POST request: %v\n", err)
 		return err
