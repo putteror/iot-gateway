@@ -126,9 +126,9 @@ func (h *DahuaCameraFaceRecognitionHandler) ReceiveFaceRecognitionImage(c *gin.C
 	// ใช้ EventSeq ในการตั้งชื่อไฟล์ หรือใช้ Unix Timestamp หาก EventSeq เป็น 0
 	var fileName string
 	if eventSeq != 0 {
-		fileName = fmt.Sprintf("faceImage.jpg")
+		fileName = "faceImage.jpg"
 	} else {
-		fileName = fmt.Sprintf("faceImage.jpg") // หรือใช้ time.Now().Unix()
+		fileName = "faceImage.jpg" // หรือใช้ time.Now().Unix()
 	}
 
 	savePath := filepath.Join(uploadDir, fileName)
