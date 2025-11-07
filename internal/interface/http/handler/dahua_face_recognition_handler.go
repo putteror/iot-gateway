@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/putteror/iot-gateway/internal/app/schema"
 	"github.com/putteror/iot-gateway/internal/app/service"
 )
 
@@ -29,7 +28,7 @@ func (h *DahuaCameraFaceRecognitionHandler) Get(c *gin.Context) {
 func (h *DahuaCameraFaceRecognitionHandler) ReceiveFaceRecognitionEvent(c *gin.Context) {
 
 	// Get body data from json request
-	var bodyRequest *schema.DahuaNVRFaceRecognitionEvent
+	var bodyRequest interface{}
 	if err := c.ShouldBindJSON(&bodyRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Failed to read request body: " + err.Error(),
