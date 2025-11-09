@@ -6,9 +6,11 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/putteror/iot-gateway/internal/adapter/push"
 	"github.com/putteror/iot-gateway/internal/app/service"
 	"github.com/putteror/iot-gateway/internal/interface/http"
 	"github.com/putteror/iot-gateway/internal/interface/http/handler"
+	dahuahandler "github.com/putteror/iot-gateway/internal/interface/http/handler/thirdparty/dahua"
 )
 
 func main() {
@@ -23,34 +25,17 @@ func main() {
 		apiServicePort = "8080"
 	}
 
-	uploadsDirPath := "./uploads"
-
-	// Ensure the uploads directory exists
-	if _, err := os.Stat(uploadsDirPath); os.IsNotExist(err) {
-		if err := os.MkdirAll(uploadsDirPath, os.ModePerm); err != nil {
-			log.Fatalf("Failed to create uploads directory: %v", err)
-		}
-		log.Printf("Created uploads directory: %s", uploadsDirPath)
-	}
-
-	dahuaNVRService := service.NewDahuaNVRService()
-	dahuaCameraFaceRecognitionService := service.NewDahuaCameraFaceRecognitionService()
-	webhookService := service.NewWebhookService()
-	hikvisionEmergencyAlarmService := service.NewHikvisionEmergencyAlarmService()
+	webhookService := service.NewWebhookService(
+		push.NewPushDataServiceImpl(),
+		push.NewCentAccessPushDataServiceImpl(),
+	)
 
 	defaultHandler := handler.NewDefaultHandler()
-	hikvisionEmergencyHandler := handler.NewHikvisionEmergencyHandler(hikvisionEmergencyAlarmService)
-	inboundHandler := handler.NewInboundHandler()
-	dahuaNVRHandler := handler.NewDahuaNVRHandler(dahuaNVRService)
-	dahuaCameraFaceRecognitionHandler := handler.NewDahuaCameraFaceRecognitionHandler(dahuaCameraFaceRecognitionService)
-	webhookHandler := handler.NewWebhookHandler(webhookService)
+	thirdPartyDahuaCameraFaceRecognitionHandler := dahuahandler.NewDahuaCameraFaceRecognitionHandler(webhookService)
+
 	appRouter := http.NewRouter(
+		thirdPartyDahuaCameraFaceRecognitionHandler,
 		defaultHandler,
-		hikvisionEmergencyHandler,
-		inboundHandler,
-		dahuaNVRHandler,
-		dahuaCameraFaceRecognitionHandler,
-		webhookHandler,
 	)
 
 	log.Printf("Server is starting on port %s", apiServicePort)

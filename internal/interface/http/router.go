@@ -6,15 +6,12 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/putteror/iot-gateway/internal/interface/http/handler"
+	dahuahandler "github.com/putteror/iot-gateway/internal/interface/http/handler/thirdparty/dahua"
 )
 
 func NewRouter(
-	defaultHandler *handler.DefaultHandler,
-	hikvisionEmergencyHandler *handler.HikvisionEmergencyHandler,
-	InboundHandler *handler.InboundHandler,
-	dahuaNVRHandler *handler.DahuaNVRHandler,
-	dahuaCameraFaceRecognitionHandler *handler.DahuaCameraFaceRecognitionHandler,
-	webhookHandler *handler.WebhookHandler,
+	thirdPartyDahuaHandler *dahuahandler.DahuaCameraFaceRecognitionHandler,
+	defaultHandler *handler.DebugHandler,
 ) *gin.Engine {
 	router := gin.Default()
 
@@ -28,58 +25,43 @@ func NewRouter(
 
 	// Apply the middleware
 	router.Use(cors.New(config))
+
+	thirdPartyApi := router.Group("/third-party")
+	{
+		dahuaApi := thirdPartyApi.Group("/dahua")
+		{
+			dahuaCameraApi := dahuaApi.Group("/camera")
+			{
+				dahuaCameraApi.POST("/face-recognition/:id", thirdPartyDahuaHandler.FaceRecognitionEvent)
+				dahuaCameraApi.POST("/face-recognition/picture/:id", thirdPartyDahuaHandler.FaceRecognitionImageEvent)
+			}
+		}
+	}
+
 	api := router.Group("/api")
 	{
 
 		// Access Control Device endpoints
-		Default := api.Group("/default")
+		apiDebug := api.Group("/debug")
 		{
-			Default.GET("/", defaultHandler.GetAll)
-			Default.GET("/:id", defaultHandler.GetByID)
-			Default.POST("/", defaultHandler.Create)
-			Default.PUT("/:id", defaultHandler.Update)
-			Default.PATCH("/", defaultHandler.Update)
-			Default.DELETE("/:id", defaultHandler.Delete)
-		}
+			apiDebugPrint := apiDebug.Group("/print")
+			{
+				apiDebugPrint.GET("/", defaultHandler.ConsolePrint)
+				apiDebugPrint.GET("/:id", defaultHandler.ConsolePrint)
+				apiDebugPrint.POST("/", defaultHandler.ConsolePrint)
+				apiDebugPrint.PUT("/:id", defaultHandler.ConsolePrint)
+				apiDebugPrint.PATCH("/", defaultHandler.ConsolePrint)
+				apiDebugPrint.DELETE("/:id", defaultHandler.ConsolePrint)
+			}
+			apiDebugPush := apiDebug.Group("/push")
+			{
+				apiDebugPush.GET("/", defaultHandler.PushRawData)
+				apiDebugPush.POST("/", defaultHandler.PushRawData)
+				apiDebugPush.PUT("/", defaultHandler.PushRawData)
+				apiDebugPush.PATCH("/", defaultHandler.PushRawData)
+				apiDebugPush.DELETE("/", defaultHandler.PushRawData)
+			}
 
-		hikvisionEmergency := api.Group("/hikvision")
-		{
-			hikvisionEmergency.POST("/emergency", hikvisionEmergencyHandler.ReceiveEmergencyAlarmEvent)
-			hikvisionEmergency.GET("/", hikvisionEmergencyHandler.Get)
-			hikvisionEmergency.POST("/", hikvisionEmergencyHandler.Post)
-			hikvisionEmergency.PATCH("/", hikvisionEmergencyHandler.Put)
-			hikvisionEmergency.DELETE("/:id", hikvisionEmergencyHandler.Delete)
-		}
-
-		Inbound := api.Group("/inbound")
-		{
-			Inbound.GET("/", InboundHandler.Get)
-			Inbound.GET("/:id", InboundHandler.Get)
-			Inbound.POST("/", InboundHandler.Post)
-			Inbound.POST("/:id", InboundHandler.Post)
-			Inbound.PUT("/", InboundHandler.Put)
-			Inbound.PUT("/:id", InboundHandler.Put)
-			Inbound.PATCH("/", InboundHandler.Put)
-			Inbound.PATCH("/:id", InboundHandler.Put)
-			Inbound.DELETE("/", InboundHandler.Delete)
-			Inbound.DELETE("/:id", InboundHandler.Delete)
-		}
-
-		dahuaNVR := api.Group("/dahua-nvr")
-		{
-			dahuaNVR.POST("/face-recognition", dahuaNVRHandler.ReceiveFaceRecognitionEvent)
-			dahuaNVR.POST("/license-plate-recognition", dahuaNVRHandler.ReceiveLicensePlateRecognitionEvent)
-		}
-
-		dahuaCameraFaceRecognition := api.Group("/dahua/camera/face-recognition")
-		{
-			dahuaCameraFaceRecognition.POST("/data/", dahuaCameraFaceRecognitionHandler.ReceiveFaceRecognitionEvent)
-			dahuaCameraFaceRecognition.POST("/picture/", dahuaCameraFaceRecognitionHandler.ReceiveFaceRecognitionImage)
-		}
-
-		webhook := api.Group("/webhook")
-		{
-			webhook.POST("/by-pass", webhookHandler.ByPassPost)
 		}
 
 	}

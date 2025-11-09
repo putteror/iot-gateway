@@ -6,18 +6,52 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/putteror/iot-gateway/internal/adapter/push"
+	"github.com/putteror/iot-gateway/internal/app/schema"
 	"github.com/putteror/iot-gateway/internal/config"
 )
 
 type WebhookService interface {
+	PushDataToDestination(paylaod interface{}, eventType string, ThirdPartyName string) string
 	WebhookByPassEvent(paylaod interface{}) string
 }
 
+// set if WEBHOOK_SERVICE_NAME = "zyta"
+
 type WebhookServiceImpl struct {
+	DestinationAdapters map[string]push.PushDataAdapter
 }
 
-func NewWebhookService() WebhookService {
-	return &WebhookServiceImpl{}
+func NewWebhookService(
+	zytaAdapter push.ZytaPushDataAdapter,
+	centAccessAdapter push.CentAccessPushDataAdapter,
+) WebhookService {
+	return &WebhookServiceImpl{
+		DestinationAdapters: map[string]push.PushDataAdapter{
+			"zyta":        zytaAdapter,       // Key คือ "zyta"
+			"cent-access": centAccessAdapter, // Key คือ "cent-access"
+		},
+	}
+}
+
+func (s *WebhookServiceImpl) PushDataToDestination(payload interface{}, eventType string, DestinationType string) string {
+
+	adapter, ok := s.DestinationAdapters[DestinationType]
+	if !ok {
+		message := fmt.Sprintf("Error: Third party adapter '%s' not supported.", DestinationType)
+		fmt.Println(message)
+		return message
+	}
+
+	// 2. เรียกใช้เมธอดของ Adapter ที่ดึงมา
+	switch eventType {
+	case "face-recognition":
+		adapter.PushFaceRecognitionEventData(payload.(*schema.FaceRecognitionEventSchema))
+	default:
+		return "Processing complete"
+	}
+
+	return "Processing complete"
 }
 
 func (s *WebhookServiceImpl) WebhookByPassEvent(paylaod interface{}) string {
@@ -30,8 +64,7 @@ func (s *WebhookServiceImpl) WebhookByPassEvent(paylaod interface{}) string {
 		return "Error: Failed to marshal JSON"
 	}
 
-	webhookPath := "/api/inbound"
-	webhookUrl := config.WEBHOOK_HOST_ADDRESS + webhookPath
+	webhookUrl := config.DESTINATION_HOST_ADDRESS
 
 	// 2. ส่ง HTTP POST request
 	resp, err := http.Post(webhookUrl, "application/json", bytes.NewBuffer(jsonPayload))
