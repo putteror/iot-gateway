@@ -131,7 +131,7 @@ type DahuaObjectData struct {
 	Speed                 int                        `json:"Speed,omitempty"`
 	SpeedTypeInternal     int                        `json:"SpeedTypeInternal,omitempty"`
 	Strabismus            int                        `json:"Strabismus,omitempty"`
-	faceTripLineDirection int                        `json:"faceTripLineDirection,omitempty"`
+	FaceTripLineDirection int                        `json:"faceTripLineDirection,omitempty"`
 	InstallDiagnosticStat DahuaInstallDiagnosticStat `json:"installDiagnosticStat,omitempty"`
 }
 

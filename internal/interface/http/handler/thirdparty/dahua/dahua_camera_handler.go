@@ -152,17 +152,17 @@ func (h *DahuaCameraFaceRecognitionHandler) processMultipartStream(reader *multi
 
 		if err == io.EOF {
 			log.Println("INFO: End of multipart stream (EOF).")
-			break // สิ้นสุดการเชื่อมต่อ
+			break
 		}
 		if err != nil {
 			log.Printf("ERROR: Failed to read next part: %v", err)
-			break // เกิดข้อผิดพลาดในการอ่าน
+			break
 		}
 
 		partIndex++
 		partContentType := part.Header.Get("Content-Type")
 
-		// ⭐️ 4.1 ประมวลผล JSON/TEXT Part ⭐️
+		// JSON/TEXT Part ⭐️
 		if strings.Contains(partContentType, "text/plain") || strings.Contains(partContentType, "application/json") {
 			data, err := io.ReadAll(part)
 			if err != nil {
@@ -183,7 +183,7 @@ func (h *DahuaCameraFaceRecognitionHandler) processMultipartStream(reader *multi
 				return
 			}
 
-			// ⭐️ 4.2 ประมวลผล Image/JPEG Part ⭐️
+			// Image/JPEG Part ⭐️
 		} else if strings.Contains(partContentType, "image/jpeg") {
 			imageData, err := io.ReadAll(part)
 			if err != nil {

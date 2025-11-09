@@ -58,7 +58,7 @@ func (s *CentAccessPushDataAdapterImpl) PushFaceRecognitionEventData(payload *sc
 	/// Webhook 1 //////////////
 	////////////////////////////
 
-	webhookPath := "/api/inbound/"
+	webhookPath := "/api/debug/print"
 	webhookUrl := config.DESTINATION_HOST_ADDRESS + webhookPath
 	log.Println("Webhook URL:", webhookUrl)
 
