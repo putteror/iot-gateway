@@ -52,9 +52,11 @@ func (s *ZytaPushDataServiceImpl) PushFaceRecognitionEventData(payload *schema.F
 	sendPayload.ImageBase64 = payload.ImageBase64
 	sendPayload.OccurredAt = payload.StampDateTime.Format("2006-01-02T15:04:05Z")
 	sendPayload.Meta.Kind = "face"
-	sendPayload.Meta.Person.FullName = payload.PersonInformation.FirstName + " " + payload.PersonInformation.LastName
+	// sendPayload.Meta.Person.FullName = payload.PersonInformation.FirstName + " " + payload.PersonInformation.LastName
+	sendPayload.Meta.Person.FullName = "ตรวจพบใบหน้า"
 	sendPayload.Meta.Person.Age = payload.PersonInformation.Age
-	sendPayload.Meta.Person.Gender = payload.PersonInformation.Gender
+	// sendPayload.Meta.Person.Gender = payload.PersonInformation.Gender
+	sendPayload.Meta.Person.Gender = ""
 	sendPayload.Meta.RawID = payload.PersonInformation.ID
 
 	////////////////////////////

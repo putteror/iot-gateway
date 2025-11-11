@@ -19,7 +19,7 @@ func NewGetPM25Impl() GetPM25 {
 func (s *GetPM25Impl) GetPM25Value() (float64, float64, float64, float64, error) {
 
 	minPm25 := 29.0
-	maxPm25 := 33.0
+	maxPm25 := 31.0
 
 	diff := maxPm25 - minPm25
 	randomValue := rand.Float64()*diff + minPm25
@@ -42,7 +42,7 @@ func (s *GetPM25Impl) GetPM25Value() (float64, float64, float64, float64, error)
 		return 0.0, 0.0, 0.0, 0.0, err
 	}
 
-	minHumidity := 60.0
+	minHumidity := 65.0
 	maxHumidity := 70.0
 
 	humidityDiff := maxHumidity - minHumidity
@@ -55,7 +55,7 @@ func (s *GetPM25Impl) GetPM25Value() (float64, float64, float64, float64, error)
 	}
 
 	minTemperature := 30.0
-	maxTemperature := 31.0
+	maxTemperature := 30.5
 
 	temperatureDiff := maxTemperature - minTemperature
 	randomTemperatureValue := rand.Float64()*temperatureDiff + maxTemperature
