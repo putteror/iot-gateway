@@ -249,7 +249,8 @@ func (s *ZytaPushDataServiceImpl) PushWaterSensorData() error {
 	drinkingPH := generateRandomFloat(6.5, 7.0) // pH 6.5 - 7.0 (กรดอ่อนๆ ถึงกลาง)
 	// TDS 80 - 150 ppm
 	timestampSecInt := (time.Now().Unix())
-	setCalValue := (timestampSecInt - 1762830000) / 100
+	setCalValue := ((timestampSecInt - 1762836000) / 100)
+	fmt.Println(setCalValue)
 	domesticToday := int(setCalValue*100) / 7
 	tdsPpm := int(setCalValue*100) / 60
 	drinkingToday := int(setCalValue*100) / 15
