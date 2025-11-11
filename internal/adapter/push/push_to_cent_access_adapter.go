@@ -13,6 +13,8 @@ import (
 
 type CentAccessPushDataAdapter interface {
 	PushFaceRecognitionEventData(payload *schema.FaceRecognitionEventSchema) error
+	PushPM25Value(pm25Value float64, pm10Value float64, humidityValue float64, temperatureValue float64) error
+	PushWaterSensorData() error
 }
 
 type CentAccessPushDataAdapterImpl struct {
@@ -91,5 +93,18 @@ func (s *CentAccessPushDataAdapterImpl) PushFaceRecognitionEventData(payload *sc
 		fmt.Println("Webhook sent successfully.")
 	}
 
+	return nil
+}
+
+func (s *CentAccessPushDataAdapterImpl) PushPM25Value(pm25Value float64, pm10Value float64, humidityValue float64, temperatureValue float64) error {
+	log.Println("PM2.5 value pushed to Cent Access : " + fmt.Sprintf("%.2f", pm25Value))
+	log.Println("PM10 value pushed to Cent Access : " + fmt.Sprintf("%.2f", pm10Value))
+	log.Println("Humidity value pushed to Cent Access : " + fmt.Sprintf("%.2f", humidityValue))
+	log.Println("Temperature value pushed to Cent Access : " + fmt.Sprintf("%.2f", temperatureValue))
+	return nil
+}
+
+func (s *CentAccessPushDataAdapterImpl) PushWaterSensorData() error {
+	log.Println("Water sensor data pushed to Cent Access")
 	return nil
 }

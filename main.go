@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/putteror/iot-gateway/internal/adapter"
 	"github.com/putteror/iot-gateway/internal/adapter/push"
 	"github.com/putteror/iot-gateway/internal/app/service"
 	"github.com/putteror/iot-gateway/internal/interface/http"
@@ -14,6 +15,18 @@ import (
 )
 
 func main() {
+
+	pm25Fetcher := adapter.NewGetPM25Impl()
+	zytaAdapter := push.NewPushDataServiceImpl()
+	centAccessAdapter := push.NewCentAccessPushDataServiceImpl()
+
+	retentionService := service.NewRetentionService(pm25Fetcher, zytaAdapter, centAccessAdapter)
+	if err := retentionService.RetentionGetPM25AndPushToDestination(); err != nil {
+		log.Fatalf("Failed to start PM2.5 background job: %v", err)
+	}
+	if err := retentionService.RetentionGetWaterSensorAndPushToDestination(); err != nil {
+		log.Fatalf("Failed to start Water Sensor background job: %v", err)
+	}
 
 	err := godotenv.Load()
 	if err != nil {
