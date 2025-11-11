@@ -250,7 +250,6 @@ func (s *ZytaPushDataServiceImpl) PushWaterSensorData() error {
 	// TDS 80 - 150 ppm
 	timestampSecInt := (time.Now().Unix())
 	setCalValue := ((timestampSecInt - 1762836000) / 100)
-	fmt.Println(setCalValue)
 	domesticToday := int(setCalValue*100) / 7
 	tdsPpm := int(setCalValue*100) / 60
 	drinkingToday := int(setCalValue*100) / 15
