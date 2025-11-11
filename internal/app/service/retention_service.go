@@ -60,7 +60,7 @@ func (s *RetentionServiceImpl) RetentionGetPM25AndPushToDestination() error {
 			}
 
 			adapter.PushPM25Value(pm25Value, pm10Value, humidityValue, temperatureValue)
-			time.Sleep(5 * time.Minute)
+			time.Sleep(5 * time.Second)
 		}
 
 	}()
@@ -80,7 +80,7 @@ func (s *RetentionServiceImpl) RetentionGetWaterSensorAndPushToDestination() err
 
 		for {
 			adapter.PushWaterSensorData()
-			time.Sleep(5 * time.Minute)
+			time.Sleep(5 * time.Second)
 		}
 
 	}()
