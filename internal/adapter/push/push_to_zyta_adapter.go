@@ -243,19 +243,19 @@ func (s *ZytaPushDataServiceImpl) PushWaterSensorData() error {
 	domesticPH := generateRandomFloat(7.0, 7.5)    // pH 7.0 - 7.5 (เป็นกลางถึงด่างเล็กน้อย)
 	flowRateLpm := generateRandomFloat(30.0, 45.0) // 30 - 45 ลิตร/นาที
 	// ปริมาณการใช้น้ำใช้ในวันนี้ (Domestic Today)
-	// domesticToday := int(generateRandomFloat(800, 1100))
+	domesticToday := int(generateRandomFloat(800, 1100))
 
 	// 2. สุ่มค่า Drinking (น้ำดื่ม)
 	drinkingPH := generateRandomFloat(6.5, 7.0) // pH 6.5 - 7.0 (กรดอ่อนๆ ถึงกลาง)
 	// TDS 80 - 150 ppm
-	timestampSecInt := (time.Now().Unix())
-	setCalValue := ((timestampSecInt - 1762836000) / 100)
-	domesticToday := int(setCalValue*100) / 7
-	tdsPpm := int(setCalValue*100) / 60
-	drinkingToday := int(setCalValue*100) / 15
-	// tdsPpm := int(generateRandomFloat(80, 150))
+	// timestampSecInt := (time.Now().Unix())
+	// setCalValue := ((timestampSecInt - 1762836000) / 100)
+	// domesticToday := int(setCalValue*100) / 7
+	// tdsPpm := int(setCalValue*100) / 60
+	// drinkingToday := int(setCalValue*100) / 15
+	tdsPpm := int(generateRandomFloat(80, 150))
 	// ปริมาณการใช้น้ำดื่มในวันนี้ (Drinking Today)
-	// drinkingToday := int(generateRandomFloat(350, 500))
+	drinkingToday := int(generateRandomFloat(350, 500))
 
 	// 3. กำหนดค่าคงที่สำหรับข้อมูลอนุกรมรายเดือนและ Timeline
 	// (เพื่อให้ข้อมูล Mock ดูสมจริง ไม่เปลี่ยนมั่วทุกครั้งที่เรียก)
