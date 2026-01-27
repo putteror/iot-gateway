@@ -116,7 +116,7 @@ func (s *ZytaPushDataServiceImpl) PushEmergencyAlarmEventData(payload *schema.Em
 	var sendPayload = new(ZytaEmergencyAlarmEventSchema)
 	sendPayload.Type = "alert"
 	sendPayload.TitleKey = "zytaNotis.sos"
-	sendPayload.Title = "gateway send"
+	sendPayload.Title = "Emergency Alarm"
 	sendPayload.SiteID = payload.SiteID
 	sendPayload.DeviceID = payload.DeviceInformation.ID
 
@@ -147,8 +147,8 @@ func (s *ZytaPushDataServiceImpl) PushEmergencyAlarmEventData(payload *schema.Em
 	//// tentative //////////////
 	// print request body, header
 	//// tentative //////////////
-	log.Println("Request Header:", req.Header)
-	log.Println("Request Body:", string(convertedJsonPayload))
+	// log.Println("Request Header:", req.Header)
+	// log.Println("Request Body:", string(convertedJsonPayload))
 
 	resp, err := client.Do(req)
 	if err != nil {
