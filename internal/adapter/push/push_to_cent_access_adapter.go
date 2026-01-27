@@ -13,6 +13,7 @@ import (
 
 type CentAccessPushDataAdapter interface {
 	PushFaceRecognitionEventData(payload *schema.FaceRecognitionEventSchema) error
+	PushEmergencyAlarmEventData(payload *schema.EmergencyAlarmEventSchema) error
 	PushPM25Value(pm25Value float64, pm10Value float64, humidityValue float64, temperatureValue float64) error
 	PushWaterSensorData() error
 }
@@ -93,6 +94,11 @@ func (s *CentAccessPushDataAdapterImpl) PushFaceRecognitionEventData(payload *sc
 		fmt.Println("Webhook sent successfully.")
 	}
 
+	return nil
+}
+
+func (s *CentAccessPushDataAdapterImpl) PushEmergencyAlarmEventData(payload *schema.EmergencyAlarmEventSchema) error {
+	log.Println("Emergency alarm event data pushed to Cent Access")
 	return nil
 }
 

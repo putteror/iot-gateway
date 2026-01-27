@@ -47,6 +47,8 @@ func (s *WebhookServiceImpl) PushDataToDestination(payload interface{}, eventTyp
 	switch eventType {
 	case "face-recognition":
 		adapter.PushFaceRecognitionEventData(payload.(*schema.FaceRecognitionEventSchema))
+	case "emergency-alarm":
+		adapter.PushEmergencyAlarmEventData(payload.(*schema.EmergencyAlarmEventSchema))
 	default:
 		return "Processing complete"
 	}

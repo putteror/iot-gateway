@@ -7,10 +7,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/putteror/iot-gateway/internal/interface/http/handler"
 	dahuahandler "github.com/putteror/iot-gateway/internal/interface/http/handler/thirdparty/dahua"
+	hikvisionhandler "github.com/putteror/iot-gateway/internal/interface/http/handler/thirdparty/hikvision"
 )
 
 func NewRouter(
 	thirdPartyDahuaHandler *dahuahandler.DahuaCameraFaceRecognitionHandler,
+	thirdPartyHikvisionHandler *hikvisionhandler.HikvisionCameraEmergencyAlarmHandler,
 	defaultHandler *handler.DebugHandler,
 ) *gin.Engine {
 	router := gin.Default()
@@ -34,6 +36,14 @@ func NewRouter(
 			{
 				dahuaCameraApi.POST("/face-recognition/:id", thirdPartyDahuaHandler.FaceRecognitionEvent)
 				dahuaCameraApi.POST("/face-recognition/picture/:id", thirdPartyDahuaHandler.FaceRecognitionImageEvent)
+			}
+		}
+
+		hikvisionApi := thirdPartyApi.Group("/hikvision")
+		{
+			hikvisionCameraApi := hikvisionApi.Group("/camera")
+			{
+				hikvisionCameraApi.POST("/emergency-alarm/:id", thirdPartyHikvisionHandler.EmergencyAlarmEvent)
 			}
 		}
 	}

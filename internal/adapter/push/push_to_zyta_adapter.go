@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"math/rand/v2"
 	"net/http"
@@ -15,6 +16,7 @@ import (
 
 type ZytaPushDataAdapter interface {
 	PushFaceRecognitionEventData(payload *schema.FaceRecognitionEventSchema) error
+	PushEmergencyAlarmEventData(payload *schema.EmergencyAlarmEventSchema) error
 	PushPM25Value(pm25Value float64, pm10Value float64, humidityValue float64, temperatureValue float64) error
 	PushWaterSensorData() error
 }
@@ -94,6 +96,78 @@ func (s *ZytaPushDataServiceImpl) PushFaceRecognitionEventData(payload *schema.F
 		log.Printf("Webhook responded with status code: %d\n", resp.StatusCode)
 	} else {
 		log.Println("Webhook sent successfully.")
+	}
+
+	return nil
+}
+
+func (s *ZytaPushDataServiceImpl) PushEmergencyAlarmEventData(payload *schema.EmergencyAlarmEventSchema) error {
+
+	type ZytaEmergencyAlarmEventSchema struct {
+		Type       string `json:"type"`
+		Severity   string `json:"severity"`
+		TitleKey   string `json:"titleKey"`
+		Title      string `json:"title"`
+		DeviceID   string `json:"deviceId"`
+		OccurredAt string `json:"occurredAt"`
+	}
+
+	var sendPayload = new(ZytaEmergencyAlarmEventSchema)
+	sendPayload.Type = "alert"
+	sendPayload.TitleKey = "zytaNotis.sos"
+	sendPayload.Title = "test"
+	sendPayload.DeviceID = payload.DeviceInformation.ID
+	sendPayload.OccurredAt = payload.StampDateTime.Format("2006-01-02T15:04:05Z")
+
+	////////////////////////////
+	/// Webhook 1 //////////////
+	////////////////////////////
+
+	webhookPath := "/api/webhooks/notis"
+	webhookUrl := config.DESTINATION_HOST_ADDRESS + webhookPath
+	log.Println("Push data to URL:", webhookUrl)
+
+	convertedJsonPayload, err := json.Marshal(sendPayload)
+	if err != nil {
+		fmt.Printf("Error marshalling JSON: %v\n", err)
+		return err
+	}
+
+	client := &http.Client{}
+
+	req, err := http.NewRequest("POST", webhookUrl, bytes.NewBuffer(convertedJsonPayload))
+	if err != nil {
+		log.Printf("Error creating HTTP request: %v\n", err)
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Device-Key", payload.DeviceInformation.ID)
+
+	//// tentative //////////////
+	// print request body, header
+	//// tentative //////////////
+	log.Println("Request Header:", req.Header)
+	log.Println("Request Body:", string(convertedJsonPayload))
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("Error sending webhook POST request: %v\n", err)
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Printf("Error reading body: %v\n", err)
+		} else {
+			// Cast ke string agar bisa dibaca di log
+			//// tentative //////////////
+			fmt.Printf("Response Body: %s\n", string(bodyBytes))
+		}
+		log.Printf("Webhook responded with status code: %d\n", resp.StatusCode)
+	} else {
+		log.Println("Webhook alarm sent successfully.")
 	}
 
 	return nil

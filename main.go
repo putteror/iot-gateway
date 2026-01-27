@@ -12,6 +12,7 @@ import (
 	"github.com/putteror/iot-gateway/internal/interface/http"
 	"github.com/putteror/iot-gateway/internal/interface/http/handler"
 	dahuahandler "github.com/putteror/iot-gateway/internal/interface/http/handler/thirdparty/dahua"
+	hikvisionhandler "github.com/putteror/iot-gateway/internal/interface/http/handler/thirdparty/hikvision"
 )
 
 func main() {
@@ -45,9 +46,11 @@ func main() {
 
 	defaultHandler := handler.NewDefaultHandler()
 	thirdPartyDahuaCameraFaceRecognitionHandler := dahuahandler.NewDahuaCameraFaceRecognitionHandler(webhookService)
+	thirdPartyHikvisionCameraEmergencyAlarmHandler := hikvisionhandler.NewHikvisionCameraEmergencyAlarmHandler(webhookService)
 
 	appRouter := http.NewRouter(
 		thirdPartyDahuaCameraFaceRecognitionHandler,
+		thirdPartyHikvisionCameraEmergencyAlarmHandler,
 		defaultHandler,
 	)
 
