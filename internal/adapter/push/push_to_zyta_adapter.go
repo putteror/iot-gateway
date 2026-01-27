@@ -111,12 +111,14 @@ func (s *ZytaPushDataServiceImpl) PushEmergencyAlarmEventData(payload *schema.Em
 		SiteID     string `json:"siteId"`
 		DeviceID   string `json:"deviceId"`
 		OccurredAt string `json:"occurredAt"`
+		Meta       struct {
+		} `json:"meta"`
 	}
 
 	var sendPayload = new(ZytaEmergencyAlarmEventSchema)
 	sendPayload.Type = "alert"
 	sendPayload.TitleKey = "zytaNotis.sos"
-	sendPayload.Title = "test"
+	sendPayload.Title = "gateway send"
 	sendPayload.SiteID = payload.SiteID
 	sendPayload.DeviceID = payload.DeviceInformation.ID
 	sendPayload.OccurredAt = payload.StampDateTime.Format("2006-01-02T15:04:05Z")
