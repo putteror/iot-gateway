@@ -23,6 +23,7 @@ func NewHikvisionCameraEmergencyAlarmHandler(service service.WebhookService) *Hi
 func (h *HikvisionCameraEmergencyAlarmHandler) EmergencyAlarmEvent(c *gin.Context) {
 
 	deviceID := c.Param("id")
+	siteID := c.Param("siteId")
 
 	// Get body data from json request
 	var bodyRequest *hikvision.HikvisionCameraEmergencyAlarmEventSchema
@@ -36,6 +37,7 @@ func (h *HikvisionCameraEmergencyAlarmHandler) EmergencyAlarmEvent(c *gin.Contex
 	var defaultPayload = new(schema.EmergencyAlarmEventSchema)
 	defaultPayload.Type = "info"
 	defaultPayload.StampDateTime = time.Unix(int64(bodyRequest.Data.UTC), 0)
+	defaultPayload.SiteID = siteID
 	defaultPayload.DeviceInformation.ID = deviceID
 	h.service.PushDataToDestination(defaultPayload, "emergency-alarm", config.DESTINATION_TYPE)
 

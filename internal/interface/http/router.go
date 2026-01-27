@@ -43,7 +43,7 @@ func NewRouter(
 		{
 			hikvisionCameraApi := hikvisionApi.Group("/camera")
 			{
-				hikvisionCameraApi.POST("/emergency-alarm/:id", thirdPartyHikvisionHandler.EmergencyAlarmEvent)
+				hikvisionCameraApi.POST("/emergency-alarm/:id/site/:siteId", thirdPartyHikvisionHandler.EmergencyAlarmEvent)
 			}
 		}
 	}
