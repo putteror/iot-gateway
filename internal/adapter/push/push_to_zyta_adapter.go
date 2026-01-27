@@ -104,14 +104,12 @@ func (s *ZytaPushDataServiceImpl) PushFaceRecognitionEventData(payload *schema.F
 func (s *ZytaPushDataServiceImpl) PushEmergencyAlarmEventData(payload *schema.EmergencyAlarmEventSchema) error {
 
 	type ZytaEmergencyAlarmEventSchema struct {
-		Type       string `json:"type"`
-		Severity   string `json:"severity"`
-		TitleKey   string `json:"titleKey"`
-		Title      string `json:"title"`
-		SiteID     string `json:"siteId"`
-		DeviceID   string `json:"deviceId"`
-		OccurredAt string `json:"occurredAt"`
-		Meta       struct {
+		Type     string `json:"type"`
+		TitleKey string `json:"titleKey"`
+		Title    string `json:"title"`
+		SiteID   string `json:"siteId"`
+		DeviceID string `json:"deviceId"`
+		Meta     struct {
 		} `json:"meta"`
 	}
 
@@ -121,7 +119,6 @@ func (s *ZytaPushDataServiceImpl) PushEmergencyAlarmEventData(payload *schema.Em
 	sendPayload.Title = "gateway send"
 	sendPayload.SiteID = payload.SiteID
 	sendPayload.DeviceID = payload.DeviceInformation.ID
-	sendPayload.OccurredAt = payload.StampDateTime.Format("2006-01-02T15:04:05Z")
 
 	////////////////////////////
 	/// Webhook 1 //////////////
