@@ -75,7 +75,7 @@ func (h *DebugHandler) ConsolePrint(c *gin.Context) {
 
 	// convert byte to string for return
 	rawBody := string(bodyBytes)
-	fmt.Println(rawBody[:5000])
+	fmt.Println(rawBody)
 
 	fmt.Println("\n=========== End Print Request =============")
 
